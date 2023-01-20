@@ -64,4 +64,4 @@ export const deleteUser = async (req, res) =>{
 }
 
 //follow a User
-//quede en hora 1:14:00
+//quede en hora 1:14:02
