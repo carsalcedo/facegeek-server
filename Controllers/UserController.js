@@ -64,4 +64,56 @@ export const deleteUser = async (req, res) =>{
 }
 
 //follow a User
-//quede en hora 1:14:02
+export const followUser = async (req, res) =>{
+    const id = req.params.id;
+
+    const {currentUserId} = req.body;
+
+    if(currentUserId === id){
+        res.status(404).json("Action forbidden")//prohibe que un usuario se siga a si mismo
+    }
+    else{
+        try {
+            const followUser = await UserModel.findById(id)
+            const followingUser = await UserModel.findById(currentUserId)
+
+            if(!followUser.followers.includes(currentUserId)){
+                await followUser.updateOne({$push : {followers: currentUserId}})
+                await followingUser.updateOne({$push : {followings: id}})
+                res.status(200).json("user followed")
+            }
+            else{
+                res.status(403).json("User is already followed by you")
+            }
+        } catch (error) {
+            res.status(500).json(error)
+        }
+    }
+}
+//unfolllow user
+export const UnFollowUser = async (req, res) =>{
+    const id = req.params.id;
+
+    const {currentUserId} = req.body;
+
+    if(currentUserId === id){
+        res.status(404).json("Action forbidden")//prohibe que un usuario se siga a si mismo
+    }
+    else{
+        try {
+            const followUser = await UserModel.findById(id)
+            const followingUser = await UserModel.findById(currentUserId)
+
+            if(followUser.followers.includes(currentUserId)){
+                await followUser.updateOne({$pull : {followers: currentUserId}})
+                await followingUser.updateOne({$pull : {followings: id}})
+                res.status(200).json("user unfollowed")
+            }
+            else{
+                res.status(403).json("User is not followed by you")
+            }
+        } catch (error) {
+            res.status(500).json(error)
+        }
+    }
+}
